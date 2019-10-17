@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'myparametersmarketsup.dart';
 
-class MyParamsMarketNum extends StatelessWidget {
+class MyParamsMarketNum extends StatefulWidget {
+  @override
+  _MyParamsMarketNumState createState() => _MyParamsMarketNumState();
+}
+
+class _MyParamsMarketNumState extends State<MyParamsMarketNum> {
+  var number = TextEditingController();
+  var ope = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +30,7 @@ class MyParamsMarketNum extends StatelessWidget {
                 height: 60,
                 child: TextField(
                   style: new TextStyle(color: Colors.white, fontSize: 25),
+                  controller: number,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
@@ -43,12 +51,13 @@ class MyParamsMarketNum extends StatelessWidget {
                 height: 60,
                 child: TextField(
                   style: new TextStyle(color: Colors.white, fontSize: 25),
+                  controller: ope,
                   textAlign: TextAlign.center,
                   decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.grey, width: 6.0),
                       ),
-                      hintText: 'Opération liée(optionel)'
+                      hintText: 'Opération liée'
                   ),
                 ),
               ),
@@ -64,7 +73,7 @@ class MyParamsMarketNum extends StatelessWidget {
                     child: new Text('Ajouter un numéro \nde marché',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: null,
+                    onPressed: () {savemarket();},
                 ),
               ),
               new Padding(padding: new EdgeInsets.all(20.0)),
@@ -91,4 +100,17 @@ class MyParamsMarketNum extends StatelessWidget {
       ),
     );
   }
+
+  void savemarket() {
+    String _number = number.text;
+    String _ope = ope.text;
+    _savemarket(_number, _ope).then((bool commited) {
+      Navigator.pop(context,true);});
+  }
+}
+
+Future<bool> _savemarket(String number, String ope) async {
+  if (number != null && number != "" && ope != null && ope != "")
+
+  return true;
 }
