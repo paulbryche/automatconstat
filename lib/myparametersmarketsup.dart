@@ -127,11 +127,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
     );
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('markets');
-    return List.generate(maps.length, (i) {
-      return String(
-        market: maps[i]['market'],
-      );
-    });
+    return List.generate(maps.length, (i) => "$maps[i]['market']");
   }
 }
 
