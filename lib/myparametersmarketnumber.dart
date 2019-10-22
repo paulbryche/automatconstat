@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'myparametersmarketsup.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
+import 'databasemarket.dart';
 
 class MyParamsMarketNum extends StatefulWidget {
   @override
@@ -73,7 +76,7 @@ class _MyParamsMarketNumState extends State<MyParamsMarketNum> {
                     child: new Text('Ajouter un numéro \nde marché',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: () {savemarket();},
+                    onPressed: () {savemarket(context);},
                 ),
               ),
               new Padding(padding: new EdgeInsets.all(20.0)),
@@ -101,16 +104,46 @@ class _MyParamsMarketNumState extends State<MyParamsMarketNum> {
     );
   }
 
-  void savemarket() {
+  void savemarket(context) {
     String _number = number.text;
     String _ope = ope.text;
     _savemarket(_number, _ope).then((bool commited) {
       Navigator.pop(context,true);});
   }
 }
-
 Future<bool> _savemarket(String number, String ope) async {
-  if (number != null && number != "" && ope != null && ope != "")
 
+  final database = openDatabase(
+    join(await getDatabasesPath(), 'markets_database.db'),
+    onCreate: (db, version) {
+      return db.execute(
+        "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+      );
+    },
+    version: 1,
+  );
+
+  Future<void> insertMarket(Market market) async {
+    final Database db = await database;
+
+    await db.insert(
+      'markets',
+      market.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  if (number != null && number != "" && ope != null && ope != "") {
+    var mymarket = Market(
+      id: await datalenght() + 1,
+      market: '$number',
+      mdescription: "$ope",
+      ticket: null,
+      tdescription: null,
+    );
+    await insertMarket(mymarket);
+
+    print(await markets());
+  }
   return true;
 }

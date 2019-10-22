@@ -148,5 +148,5 @@ Future<bool> _savename(String name, String first) async {
     prefs.setString("name", name);
   if(first != null && first != "")
     prefs.setString("first", first);
-  return prefs.commit();
+  return true;
 }

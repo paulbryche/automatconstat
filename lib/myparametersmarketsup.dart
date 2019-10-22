@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'mycreatordate3.dart';
+import 'databasemarket.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class MyParamsMarketSup extends StatelessWidget {
 
@@ -46,10 +48,7 @@ class MyParamsMarketSup extends StatelessWidget {
                   child: new Text('Supprimer',
                     textAlign: TextAlign.center,
                     style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyCreatorDate3()),
-                      );
-                  }
+                  onPressed: () {savemarket(marketnumber, context);},
                 ),
               ),
             ],
@@ -57,6 +56,11 @@ class MyParamsMarketSup extends StatelessWidget {
         ),
       ),
     );
+  }
+  void savemarket(marketnumber, context) {
+
+    _supmarket(marketnumber).then((bool commited) {
+      Navigator.pop(context,true);});
   }
 }
 
@@ -69,6 +73,7 @@ class MyStatefulWidget extends StatefulWidget {
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String dropdownValue = 'Choisir';
+  List<String> markets = marketlist();
 
   @override
   Widget build(BuildContext context) {
@@ -110,4 +115,45 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
     );
   }
+  Future<List<String>> marketlist() async {
+    final database = openDatabase(
+      join(await getDatabasesPath(), 'markets_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+        );
+      },
+      version: 1,
+    );
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('markets');
+    return List.generate(maps.length, (i) {
+      return String(
+        market: maps[i]['market'],
+      );
+    });
+  }
+}
+
+Future<bool> _supmarket(String marketnumber) async {
+  final database = openDatabase(
+    join(await getDatabasesPath(), 'markets_database.db'),
+    onCreate: (db, version) {
+      return db.execute(
+        "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+      );
+    },
+    version: 1,
+  );
+  if (marketnumber != null && marketnumber != "") {
+    final db = await database;
+
+    await db.delete(
+      'markets',
+      where: "market = ?",
+      whereArgs: [marketnumber],
+    );
+  }
+  print(await markets());
+  return true;
 }

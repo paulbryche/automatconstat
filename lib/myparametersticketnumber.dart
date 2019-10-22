@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'myparameterstiketsup.dart';
+import 'databasemarket.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart';
 
 class MyParamsTicketNum extends StatefulWidget {
   @override
@@ -10,6 +13,8 @@ class MyParamsTicketNum extends StatefulWidget {
   class _MyParamsTicketNumState extends State<MyParamsTicketNum> {
   var number = TextEditingController();
   var ope = TextEditingController();
+  String marketnumber = null;
+  String description = null;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +89,7 @@ class MyParamsTicketNum extends StatefulWidget {
                     child: new Text('Ajouter un numéro de bon de commande',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 25),),
-                    onPressed: null,
+                  onPressed: () {saveticket(context);},
                 ),
               ),
               new Padding(padding: new EdgeInsets.all(20.0)),
@@ -111,18 +116,72 @@ class MyParamsTicketNum extends StatefulWidget {
       ),
     );
   }
-  void saveticket() {
+  void saveticket(context) {
     String _number = number.text;
     String _ope = ope.text;
+    String _marketnumber = marketnumber;
+    String _description = description;
     _saveticket(_number, _ope).then((bool commited) {
       Navigator.pop(context,true);});
   }
 }
 
 Future<bool> _saveticket(String number, String ope) async {
-  if (number != null && number != "" && ope != null && ope != "")
+  final database = openDatabase(
+    join(await getDatabasesPath(), 'markets_database.db'),
+    onCreate: (db, version) {
+      return db.execute(
+        "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+      );
+      },
+    version: 1,
+  );
 
-    return true;
+  Future<void> insertMarket(Market market) async {
+    final Database db = await database;
+
+    await db.insert(
+      'markets',
+      market.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<int> datalenght() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('markets');
+
+    return (maps.length);
+  }
+
+  Future<List<Market>> markets() async {
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('markets');
+
+    return List.generate(maps.length, (i) {
+      return Market(
+        id: maps[i]['id'],
+        market: maps[i]['market'],
+        mdescription: maps[i]['mdescription'],
+        ticket: maps[i]['ticket'],
+        tdescription: maps[i]['tdescription'],
+      );
+    });
+  }
+
+
+  if (number != null && number != "" && ope != null && ope != "") {
+     var mymarket = Market(
+       id: await datalenght() + 1,
+       market: '$marketnumber',
+       mdescription: "$description",
+       ticket: '$number',
+       tdescription: '$ope',
+     );
+     await insertMarket(mymarket);
+     print(await markets());
+  }
+  return true;
 }
 
 class MyStatefulWidget extends StatefulWidget {
