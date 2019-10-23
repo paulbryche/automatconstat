@@ -48,7 +48,7 @@ class MyParamsMarketSup extends StatelessWidget {
                   child: new Text('Supprimer',
                     textAlign: TextAlign.center,
                     style: new TextStyle(color: Colors.white, fontSize: 30),),
-                  onPressed: () {savemarket(marketnumber, context);},
+                  onPressed: () {supmarket(marketnumber, context);},
                 ),
               ),
             ],
@@ -57,7 +57,7 @@ class MyParamsMarketSup extends StatelessWidget {
       ),
     );
   }
-  void savemarket(marketnumber, context) {
+  void supmarket(marketnumber, context) {
 
     _supmarket(marketnumber).then((bool commited) {
       Navigator.pop(context,true);});
@@ -73,7 +73,8 @@ class MyStatefulWidget extends StatefulWidget {
 
 class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   String dropdownValue = 'Choisir';
-  List<String> markets = marketlist();
+  Future<List<Market>> marketlist = markets();
+  List<String> item = getnumber();
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +84,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           width: 300,
           height: 60,
           color: Colors.grey,
-          child:Center(
+          child: Center(
             child: new Theme(
               data: Theme.of(context).copyWith(
                 canvasColor: Colors.grey,),
@@ -96,18 +97,20 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                   setState(() {
                     dropdownValue = newValue;
                   });
-                  },
-                items: <String>['Choisir','ONE', 'TWO', 'THREE', 'FOUR']
+                },
+                items: <String>['Choisir', 'ONE', 'TWO', 'THREE', 'FOUR']
                     .map<DropdownMenuItem<String>>((String value) {
-                      return new DropdownMenuItem<String>(
-                        value: value,
+                  return new DropdownMenuItem<String>(
+                    value: value,
 //                        child: new Container(
 //                          color: Colors.grey,
-                          child: Text(value,
-                            style: new TextStyle(backgroundColor: Colors.grey,color: Colors.white, fontSize: 25),),
+                    child: Text(value,
+                      style: new TextStyle(backgroundColor: Colors.grey,
+                          color: Colors.white,
+                          fontSize: 25),),
 //                        ),
-                      );
-                    }).toList(),
+                  );
+                }).toList(),
               ),
             ),
           ),
@@ -115,20 +118,14 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       ),
     );
   }
-  Future<List<String>> marketlist() async {
-    final database = openDatabase(
-      join(await getDatabasesPath(), 'markets_database.db'),
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
-        );
-      },
-      version: 1,
-    );
-    final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('markets');
-    return List.generate(maps.length, (i) => "$maps[i]['market']");
+}
+
+List<String> getmarketnumber() {
+  var items = new List<String>();
+  for (var contact in _contacts){
+    items.add(new String(contact));
   }
+  return items;
 }
 
 Future<bool> _supmarket(String marketnumber) async {
