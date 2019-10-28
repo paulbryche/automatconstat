@@ -173,8 +173,8 @@ Future<bool> _saveticket(String number, String ope) async {
   if (number != null && number != "" && ope != null && ope != "") {
      var mymarket = Market(
        id: await datalenght() + 1,
-       market: '$marketnumber',
-       mdescription: "$description",
+//       market: '$marketnumber',
+//       mdescription: "$description",
        ticket: '$number',
        tdescription: '$ope',
      );

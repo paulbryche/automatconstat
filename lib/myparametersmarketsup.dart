@@ -1,133 +1,72 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:flutter/painting.dart';
 import 'databasemarket.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class MyParamsMarketSup extends StatelessWidget {
+class MyParamsMarketSup extends StatefulWidget {
+  @override
+  MyParamsMarketSupState createState() => new MyParamsMarketSupState();
+}
+
+class MyParamsMarketSupState extends State<MyParamsMarketSup> {
+
+  List data;
+
+  Future<List<Market>> getmarkets() async {
+    final database = openDatabase(
+      join(await getDatabasesPath(), 'markets_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+        );
+      },
+      version: 1,
+    );
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query('markets');
+    return List<Market>.generate(maps.length, (int index) => Market(
+      id: maps[index]['id'],
+      market: maps[index]['market'],
+      mdescription: maps[index]['mdescription'],
+      ticket: maps[index]['ticket'],
+      tdescription: maps[index]['tdescription'],
+    ), growable: false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: AppBar(backgroundColor: Colors.redAccent, title: Text("Gestion des marchés")),
-      body: new Container(color: Colors.white,
-        child: new Center(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 70,
-                child: new Text("Numéro de marché:",textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 25)),
-              ),
-              new Padding(padding: new EdgeInsets.all(20.0)),
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 60,
-                child: MyStatefulWidget(),
-              ),
-              new Padding(padding: new EdgeInsets.all(20.0)),
-              new Container(
-                padding: EdgeInsets.only(top: 24),
-                width: 240,
-                height: 60,
-                child: new RaisedButton(
-                  color: Colors.redAccent,
-                  shape: RoundedRectangleBorder(side: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15)),
-                  child: new Text('Supprimer',
-                    textAlign: TextAlign.center,
-                    style: new TextStyle(color: Colors.white, fontSize: 30),),
-                  onPressed: () {supmarket(marketnumber, context);},
+      body: Container (
+        child: FutureBuilder(
+          future: getmarkets(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.data == null) {
+              return Container (
+                child: Center(
+                  child: Text("Loading..."),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-  void supmarket(marketnumber, context) {
-
-    _supmarket(marketnumber).then((bool commited) {
-      Navigator.pop(context,true);});
-  }
-}
-
-class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
-
-  @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  String dropdownValue = 'Choisir';
-  Future<List<Market>> marketlist = markets();
-  List<String> item = getnumber();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: 300,
-          height: 60,
-          color: Colors.grey,
-          child: Center(
-            child: new Theme(
-              data: Theme.of(context).copyWith(
-                canvasColor: Colors.grey,),
-              child: DropdownButton<String>(
-                iconEnabledColor: Colors.white,
-                iconDisabledColor: Colors.grey,
-                iconSize: 60,
-                value: dropdownValue,
-                onChanged: (String newValue) {
-                  setState(() {
-                    dropdownValue = newValue;
-                  });
-                },
-                items: <String>['Choisir', 'ONE', 'TWO', 'THREE', 'FOUR']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return new DropdownMenuItem<String>(
-                    value: value,
-//                        child: new Container(
-//                          color: Colors.grey,
-                    child: Text(value,
-                      style: new TextStyle(backgroundColor: Colors.grey,
-                          color: Colors.white,
-                          fontSize: 25),),
-//                        ),
+              );
+            }
+            else {
+              return ListView.builder(
+                itemCount: snapshot.data.lenght,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(snapshot.data[index].market),
                   );
-                }).toList(),
-              ),
-            ),
-          ),
+                },
+              );
+            }
+          },
         ),
-      ),
+      )
     );
   }
 }
-
-List<String> getmarketnumber() {
-  var items = new List<String>();
-  for (var contact in _contacts){
-    items.add(new String(contact));
-  }
-  return items;
-}
-
+/*
 Future<bool> _supmarket(String marketnumber) async {
   final database = openDatabase(
     join(await getDatabasesPath(), 'markets_database.db'),
@@ -150,3 +89,4 @@ Future<bool> _supmarket(String marketnumber) async {
   print(await markets());
   return true;
 }
+*/
