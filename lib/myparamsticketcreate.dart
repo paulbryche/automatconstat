@@ -4,12 +4,12 @@ import 'databasemarket.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-class MyParamsTicketSup extends StatefulWidget {
+class MyParamsTicketAdd extends StatefulWidget {
   @override
-  MyParamsTicketSupState createState() => new MyParamsTicketSupState();
+  MyParamsTicketAddState createState() => new MyParamsTicketAddState();
 }
 
-class MyParamsTicketSupState extends State<MyParamsTicketSup> {
+class MyParamsTicketAddState extends State<MyParamsTicketAdd> {
 
   List data;
 
@@ -68,30 +68,4 @@ class MyParamsTicketSupState extends State<MyParamsTicketSup> {
         )
     );
   }
-  void deleteticket(ticket, context) {
-    _deleteticket(ticket).then((bool commited) {
-      Navigator.pop(context,true);});
-  }
-}
-
-Future<bool> _deleteticket(String ticket) async {
-  final database = openDatabase(
-    join(await getDatabasesPath(), 'markets_database.db'),
-    onCreate: (db, version) {
-      return db.execute(
-        "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
-      );
-    },
-    version: 1,
-  );
-  if (ticket != null && ticket != "") {
-    final db = await database;
-
-    await db.delete(
-      'markets',
-      where: "ticket = ?",
-      whereArgs: [ticket],
-    );
-  }
-  return true;
 }

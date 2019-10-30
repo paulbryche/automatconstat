@@ -142,8 +142,6 @@ Future<bool> _savemarket(String number, String ope) async {
       tdescription: null,
     );
     await insertMarket(mymarket);
-
-    print(await markets());
   }
   return true;
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:flutter/painting.dart';
 import 'databasemarket.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -25,7 +24,8 @@ class MyParamsMarketSupState extends State<MyParamsMarketSup> {
       version: 1,
     );
     final Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('markets');
+//    final List<Map<String, dynamic>> maps = await db.query('markets', where: "ticket is ?", whereArgs: [null],);
+    final List<Map<String, dynamic>> maps = await db.rawQuery('SELECT * FROM markets WHERE ticket is NULL');
     return List<Market>.generate(maps.length, (int index) => Market(
       id: maps[index]['id'],
       market: maps[index]['market'],
@@ -43,19 +43,23 @@ class MyParamsMarketSupState extends State<MyParamsMarketSup> {
         child: FutureBuilder(
           future: getmarkets(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.data == null) {
+            if (snapshot.hasData == false) {
               return Container (
                 child: Center(
-                  child: Text("Loading..."),
+                  child: CircularProgressIndicator(),
                 ),
               );
             }
             else {
               return ListView.builder(
-                itemCount: snapshot.data.lenght,
+                itemCount: snapshot.data.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     title: Text(snapshot.data[index].market),
+                    subtitle: Text(snapshot.data[index].mdescription),
+                    onLongPress: (){
+                      deletemarket(snapshot.data[index].market, context);
+                    },
                   );
                 },
               );
@@ -65,9 +69,13 @@ class MyParamsMarketSupState extends State<MyParamsMarketSup> {
       )
     );
   }
+  void deletemarket(market, context) {
+    _deletemarket(market).then((bool commited) {
+      Navigator.pop(context,true);});
+  }
 }
-/*
-Future<bool> _supmarket(String marketnumber) async {
+
+Future<bool> _deletemarket(String marketnumber) async {
   final database = openDatabase(
     join(await getDatabasesPath(), 'markets_database.db'),
     onCreate: (db, version) {
@@ -83,10 +91,9 @@ Future<bool> _supmarket(String marketnumber) async {
     await db.delete(
       'markets',
       where: "market = ?",
-      whereArgs: [marketnumber],
+      whereArgs: [marketnumber, null],
     );
   }
   print(await markets());
   return true;
 }
-*/
