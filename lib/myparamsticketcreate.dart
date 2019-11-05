@@ -61,8 +61,8 @@ class MyParamsTicketAddState extends State<MyParamsTicketAdd> {
                           builder: (BuildContext context) =>
                           new MyParamsTicketCreateEnd(marketname: snapshot.data[index].market),
                         );
-                        Navigator.of(context).push(route);
-                        Navigator.pop(context,true);
+                        Navigator.of(context).push(route).then((bool) {Navigator.pop(context,true);});
+
                       },
                     );
                   },
@@ -150,7 +150,8 @@ class _MyParamsTicketCreateEndState extends State<MyParamsTicketCreateEnd> {
                   child: new Text('Ajouter un numéro \nde marché',
                     textAlign: TextAlign.center,
                     style: new TextStyle(color: Colors.white, fontSize: 30),),
-                  onPressed: () {saveticket(context);},
+                  onPressed: () {saveticket(context);
+                  return true;},
                 ),
               ),
             ],

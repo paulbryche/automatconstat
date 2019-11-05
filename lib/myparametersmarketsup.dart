@@ -91,7 +91,7 @@ Future<bool> _deletemarket(String marketnumber) async {
     await db.delete(
       'markets',
       where: "market = ?",
-      whereArgs: [marketnumber, null],
+      whereArgs: [marketnumber],
     );
   }
   print(await markets());
