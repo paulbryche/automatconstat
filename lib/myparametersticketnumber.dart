@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'myparameterstiketsup.dart';
+import 'myparamsticketcreate.dart';
 
 class MyParamsTicketNum extends StatefulWidget {
   @override
@@ -28,7 +29,10 @@ class _MyParamsTicketNumState extends State<MyParamsTicketNum> {
                     child: new Text('Ajouter un numéro de bon de commande',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 25),),
-                  onPressed: null,
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => MyParamsTicketAdd()),
+                    );
+                  }
                 ),
               ),
               new Padding(padding: new EdgeInsets.all(20.0)),
