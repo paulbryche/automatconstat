@@ -1,135 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
+import 'dart:async';
+import 'databasemarket.dart';
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 import 'mycreatorsize2.dart';
 
-class MyCreatorSize extends StatelessWidget {
+
+class MyCreatorSize extends StatefulWidget {
+  @override
+  MyCreatorSizeState createState() => new MyCreatorSizeState();
+}
+
+class MyCreatorSizeState extends State<MyCreatorSize> {
+
+  List data;
+
+  Future<List<Market>> getmarkets() async {
+    final database = openDatabase(
+      join(await getDatabasesPath(), 'markets_database.db'),
+      onCreate: (db, version) {
+        return db.execute(
+          "CREATE TABLE markets(id INTEGER PRIMARY KEY, market TEXT, mdescription TEXT, ticket TEXT,tdescription TEXT)",
+        );
+      },
+      version: 1,
+    );
+    final Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery('SELECT * FROM markets WHERE ticket is NULL');
+    await db.close();
+    return List<Market>.generate(maps.length, (int index) => Market(
+      id: maps[index]['id'],
+      market: maps[index]['market'],
+      mdescription: maps[index]['mdescription'],
+      ticket: maps[index]['ticket'],
+      tdescription: maps[index]['tdescription'],
+    ), growable: false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Constat de Mesure 1/5")),
-      body: new Container(color: Colors.white,
-        child: new Center(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 45,
-                child: new Text("Numéro de Marché:",textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 25)),
-              ),
-              new Padding(padding: new EdgeInsets.all(10.0)),
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 60,
-                child: MyStatefulWidget(),
-              ),
-              new Padding(padding: new EdgeInsets.all(10.0)),
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 45,
-                child: new Text("Opération liée:",textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 25)),
-              ),
-              new Padding(padding: new EdgeInsets.all(10.0)),
-              new Container(
-                decoration: ShapeDecoration(
-                  color: Colors.grey,
-                  shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 6, color: Colors.grey),
-                      borderRadius: BorderRadius.circular(15)),),
-                width: 250,
-                height: 45,
-                child: new Text("Opération",textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 25)),
-              ),
-              new Padding(padding: new EdgeInsets.all(30.0)),
-              new Container(
-                padding: EdgeInsets.only(top: 24),
-                width: 240,
-                height: 60,
-                child: new RaisedButton(
-                    color: Colors.pinkAccent,
-                    shape: RoundedRectangleBorder(side: BorderSide.none,
-                        borderRadius: BorderRadius.circular(15)),
-                    child: new Text('Etape suivante',
-                      textAlign: TextAlign.center,
-                      style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => MyCreatorSize2()),
-                      );
-                    }
-                ),
-              ),
-            ],
+        appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Choisir le Marché")),
+        body: Container (
+          child: FutureBuilder(
+            future: getmarkets(),
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.hasData == false) {
+                return Container (
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              else {
+                return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Text(snapshot.data[index].market),
+                      subtitle: Text(snapshot.data[index].mdescription),
+                      onTap: (){
+                        var route = new MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                          new MyCreatorSize2(marketname: snapshot.data[index].market),
+                        );
+                        Navigator.of(context).push(route).then((bool) {Navigator.pop(context,true);});
+                      },
+                    );
+                  },
+                );
+              }
+            },
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
-
-  @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
-}
-
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  String dropdownValue = 'Choisir';
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Container(
-          width: 300,
-          height: 60,
-          color: Colors.grey,
-          child:Center(
-            child: new Theme(
-              data: Theme.of(context).copyWith(
-                canvasColor: Colors.grey,),
-              child: DropdownButton<String>(
-                iconEnabledColor: Colors.white,
-                iconDisabledColor: Colors.grey,
-                iconSize: 60,
-                value: dropdownValue,
-                onChanged: (String newValue) {
-                  setState(() {
-                    dropdownValue = newValue;
-                  });
-                },
-                items: <String>['Choisir','ONE', 'TWO', 'THREE', 'FOUR']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return new DropdownMenuItem<String>(
-                    value: value,
-//                        child: new Container(
-//                          color: Colors.grey,
-                    child: Text(value,
-                      style: new TextStyle(backgroundColor: Colors.grey,color: Colors.white, fontSize: 25),),
-//                        ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-        ),
-      ),
+        )
     );
   }
 }
