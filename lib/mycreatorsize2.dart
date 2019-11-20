@@ -78,7 +78,7 @@ class _MyCreatorSize2State extends State<MyCreatorSize2> {
                       onTap: (){
                         var route = new MaterialPageRoute(
                           builder: (BuildContext context) =>
-                          new MyCreatorSize3(),
+                          new MyCreatorSize3(marketname: widget.marketname, ticket: snapshot.data[index].ticket, tdescription: snapshot.data[index].tdescription,),
                         );
                         Navigator.of(context).push(route).then((bool) {Navigator.pop(context,true);});
                       },
