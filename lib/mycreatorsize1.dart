@@ -64,7 +64,7 @@ class MyCreatorSizeState extends State<MyCreatorSize> {
                           builder: (BuildContext context) =>
                           new MyCreatorSize2(marketname: snapshot.data[index].market),
                         );
-                        Navigator.of(context).push(route).then((bool) {Navigator.pop(context,true);});
+                        Navigator.of(context).push(route);
                       },
                     );
                   },

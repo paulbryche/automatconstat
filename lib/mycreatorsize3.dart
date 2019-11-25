@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'mycreatorsize4.dart';
+import 'sizeimagepicker.dart';
 
 class MyCreatorSize3 extends StatefulWidget {
   final String marketname;
@@ -19,7 +19,7 @@ class _MyCreatorSize3State extends State<MyCreatorSize3> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: AppBar(backgroundColor: Colors.pinkAccent ,title: Text("Constat de mesure 3/5")),
+      appBar: AppBar(backgroundColor: Colors.pinkAccent ,title: Text("Constat de mesure 3/6")),
       body: new Container(color: Colors.white,
         child: new Center(
           child: new Column(
@@ -62,8 +62,8 @@ class _MyCreatorSize3State extends State<MyCreatorSize3> {
                     onPressed: () {
                       var route = new MaterialPageRoute(
                         builder: (BuildContext context) =>
-                        new MyCreatorSize4(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: comment.text),);
-                      Navigator.of(context).push(route).then((bool) {Navigator.pop(context,true);});
+                        new SizeImagePicker(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: comment.text),);
+                      Navigator.of(context).push(route);
                     }
                 ),
               ),
