@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'mycreatorsize4.dart';
+import 'package:image_picker_modern/image_picker_modern.dart';
 
 class SizeImagePicker extends StatefulWidget {
   final String marketname;
@@ -15,7 +18,35 @@ class SizeImagePicker extends StatefulWidget {
 }
 
 class SizeImagePickerState extends State<SizeImagePicker> {
-  List images = null;
+  List<File> images = <File>[null, null, null, null, null, null,];
+  int pos = 0;
+
+  Future getImage() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (pos < 6) {
+      setState(() {images[pos] = image;});
+    }
+    pos++;
+  }
+
+  Future getPhoto() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    if (pos < 6) {
+      setState(() {images[pos] = image;});
+    }
+    pos++;
+  }
+
+  Widget chooseimage(int index, List<File> images){
+    if (images[index] != null)
+      return (Container(
+          padding: const EdgeInsets.all(8.0),
+          alignment: Alignment.topLeft,
+          child: Image.file(images[index])
+      ));
+    else
+      return Text("No Image load");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,30 +80,31 @@ class SizeImagePickerState extends State<SizeImagePicker> {
               new ButtonBar(alignment: MainAxisAlignment.center, children: <Widget>[
                   new RaisedButton.icon(
                       shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                      onPressed: null,
+                      onPressed: getPhoto,
                       icon: new Icon(Icons.add_a_photo, size:40 , color: Colors.pinkAccent,), label: Text('appareil')),
                   new Padding(padding: new EdgeInsets.all(10.0)),
                   new RaisedButton.icon(
                       shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                      onPressed: null,
+                      onPressed: getImage,
                       icon: new Icon(Icons.add_photo_alternate, size:40, color: Colors.pinkAccent,), label: Text('galerie')),
               ],),
               new Container (
                 child: FutureBuilder(
                   builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return ListView.builder(
-                        padding: const EdgeInsets.all(10.0),
-                        itemCount: images.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return ListTile(
-                            leading: new Image(image: images[index],),
-                          );
-                        },
+                      return ListView(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(20.0),
+                          children: List.generate(images.length, (index) {
+                            return Center(
+                              child: chooseimage(index, images),
+                            );
+                          }
+                          )
                       );
                   },
                 ),
               )
-
             ],
           ),
         ),

@@ -38,7 +38,6 @@ class _MyCreatorSize2State extends State<MyCreatorSize2> {
         len = len + 1;
       }
     }
-    print(len);
     List<Market> list = new List(len);
     for (int i = 0; pos != len && i < maps.length; i++) {
       if (maps[i]['market'] == market && maps[i]['ticket'] != null && maps[i]['ticket'] != "") {

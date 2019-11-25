@@ -46,6 +46,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  image_picker_modern:
+    dependency: "direct main"
+    description:
+      name: image_picker_modern
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.12+3"
   matcher:
     dependency: transitive
     description:
@@ -120,7 +127,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.7+2"
+    version: "1.1.7+3"
   stack_trace:
     dependency: transitive
     description:
@@ -148,7 +155,7 @@ packages:
       name: synchronized
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0+1"
+    version: "2.1.0+2"
   term_glyph:
     dependency: transitive
     description:
