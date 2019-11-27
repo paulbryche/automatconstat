@@ -46,13 +46,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  image_picker_modern:
+  image_picker:
     dependency: "direct main"
     description:
-      name: image_picker_modern
+      name: image_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.12+3"
+    version: "0.6.2+1"
   matcher:
     dependency: transitive
     description:
@@ -108,7 +108,7 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.5.4+5"
+    version: "0.5.4+6"
   sky_engine:
     dependency: transitive
     description: flutter

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'mycreatorsize4.dart';
-import 'package:image_picker_modern/image_picker_modern.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SizeImagePicker extends StatefulWidget {
   final String marketname;
@@ -52,63 +52,60 @@ class SizeImagePickerState extends State<SizeImagePicker> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Constat de mesure 4/6")),
-      body: new Container(color: Colors.white,
+      body:  new Container(color: Colors.white,
         child: new Center(
-          child: new Column(
-            children: <Widget>[
-              new Container(
-                padding: EdgeInsets.only(top: 24),
-                width: 320,
-                height: 60,
-                child: new RaisedButton(
-                  color: Colors.pinkAccent,
-                  shape: RoundedRectangleBorder(side: BorderSide.none,
-                      borderRadius: BorderRadius.circular(15)),
-                  child: new Text('Etape suivante',
-                    textAlign: TextAlign.center,
-                    style: new TextStyle(color: Colors.white, fontSize: 30),),
-                  onPressed: (){
-                    var route = new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                      new MyCreatorSize4(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment),
-                    );
-                    Navigator.of(context).push(route);
+          child:Column(children: [
+            new Container(
+              padding: EdgeInsets.only(top: 24),
+              width: 320,
+              height: 60,
+              child: new RaisedButton(
+                color: Colors.pinkAccent,
+                shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                child: new Text('Etape suivante',
+                  textAlign: TextAlign.center,
+                  style: new TextStyle(color: Colors.white, fontSize: 30),),
+                onPressed: (){
+                  var route = new MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                    new MyCreatorSize4(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment),
+                  );
+                  Navigator.of(context).push(route);
                   },
-                ),
               ),
+            ),
+            new Padding(padding: new EdgeInsets.all(10.0)),
+            new ButtonBar(alignment: MainAxisAlignment.center, children: <Widget>[
+              new RaisedButton.icon(
+                  shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                  onPressed: getPhoto,
+                  icon: new Icon(Icons.add_a_photo, size:40 , color: Colors.pinkAccent,), label: Text('appareil')),
               new Padding(padding: new EdgeInsets.all(10.0)),
-              new ButtonBar(alignment: MainAxisAlignment.center, children: <Widget>[
-                  new RaisedButton.icon(
-                      shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                      onPressed: getPhoto,
-                      icon: new Icon(Icons.add_a_photo, size:40 , color: Colors.pinkAccent,), label: Text('appareil')),
-                  new Padding(padding: new EdgeInsets.all(10.0)),
-                  new RaisedButton.icon(
-                      shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                      onPressed: getImage,
-                      icon: new Icon(Icons.add_photo_alternate, size:40, color: Colors.pinkAccent,), label: Text('galerie')),
-              ],),
-              new Container (
-                child: FutureBuilder(
-                  builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      return ListView(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.all(20.0),
-                          children: List.generate(images.length, (index) {
-                            return Center(
-                              child: chooseimage(index, images),
-                            );
-                          }
-                          )
-                      );
+              new RaisedButton.icon(
+                  shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                  onPressed: getImage,
+                  icon: new Icon(Icons.add_photo_alternate, size:40, color: Colors.pinkAccent,), label: Text('galerie')),
+            ],),
+            new Container (
+              child: FutureBuilder(
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  return ListView(
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(20.0),
+                      children: List.generate(images.length, (index) {
+                        return Center(
+                          child: chooseimage(index, images),
+                        );
+                      }
+                      )
+                  );
                   },
-                ),
-              )
-            ],
-          ),
+              ),
+            )
+          ]),
         ),
-      ),
+      )
     );
   }
 }

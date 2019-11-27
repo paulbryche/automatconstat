@@ -12,7 +12,6 @@ class MyCreatorSize extends StatefulWidget {
 }
 
 class MyCreatorSizeState extends State<MyCreatorSize> {
-
   List data;
 
   Future<List<Market>> getmarkets() async {
