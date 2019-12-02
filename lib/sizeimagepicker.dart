@@ -37,12 +37,37 @@ class SizeImagePickerState extends State<SizeImagePicker> {
     pos++;
   }
 
+  void sortlist(){
+    int len = 0;
+
+    while (len < 5) {
+      if (images[len] == null && images[len + 1] != null) {
+        images[len] = images[len + 1];
+        images[len + 1] = null;
+        len++;
+      }
+      else
+        len++;
+    }
+  }
+
+  Future supandsort(int sup) {
+    if (images[sup] != null) {
+      images[sup] = null;
+      if (pos != 0)
+        setState(() {pos--;});
+      sortlist();
+    }
+    print(sup);
+    print(pos);
+  }
+
   Widget chooseimage(int index, List<File> images){
     if (images[index] != null)
       return (Container(
           padding: const EdgeInsets.all(8.0),
-          alignment: Alignment.topLeft,
-          child: Image.file(images[index])
+          alignment: Alignment.topCenter,
+          child: Image.file(images[index], width: 350,)
       ));
     else
       return Text("No Image load");
@@ -54,56 +79,76 @@ class SizeImagePickerState extends State<SizeImagePicker> {
       appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Constat de mesure 4/6")),
       body:  new Container(color: Colors.white,
         child: new Center(
-          child:Column(children: [
-            new Container(
-              padding: EdgeInsets.only(top: 24),
-              width: 320,
-              height: 60,
-              child: new RaisedButton(
-                color: Colors.pinkAccent,
-                shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                child: new Text('Etape suivante',
-                  textAlign: TextAlign.center,
-                  style: new TextStyle(color: Colors.white, fontSize: 30),),
-                onPressed: (){
-                  var route = new MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                    new MyCreatorSize4(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment),
-                  );
-                  Navigator.of(context).push(route);
-                  },
-              ),
-            ),
-            new Padding(padding: new EdgeInsets.all(10.0)),
-            new ButtonBar(alignment: MainAxisAlignment.center, children: <Widget>[
-              new RaisedButton.icon(
-                  shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                  onPressed: getPhoto,
-                  icon: new Icon(Icons.add_a_photo, size:40 , color: Colors.pinkAccent,), label: Text('appareil')),
-              new Padding(padding: new EdgeInsets.all(10.0)),
-              new RaisedButton.icon(
-                  shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                  onPressed: getImage,
-                  icon: new Icon(Icons.add_photo_alternate, size:40, color: Colors.pinkAccent,), label: Text('galerie')),
-            ],),
-            new Container (
-              child: FutureBuilder(
-                builder: (BuildContext context, AsyncSnapshot snapshot) {
-                  return ListView(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(20.0),
-                      children: List.generate(images.length, (index) {
-                        return Center(
-                          child: chooseimage(index, images),
-                        );
-                      }
-                      )
-                  );
-                  },
-              ),
-            )
-          ]),
+          child: new LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints:
+                  BoxConstraints(minHeight: viewportConstraints.maxHeight),
+                  child: Column(children: [
+                    new Container(
+                      padding: EdgeInsets.only(top: 24),
+                      width: 320,
+                      height: 60,
+                      child: new RaisedButton(
+                        color: Colors.pinkAccent,
+                        shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                        child: new Text('Etape suivante',
+                          textAlign: TextAlign.center,
+                          style: new TextStyle(color: Colors.white, fontSize: 30),),
+                        onPressed: (){
+                          var route = new MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                            new MyCreatorSize4(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment),
+                          );
+                          Navigator.of(context).push(route);
+                          },
+                      ),
+                    ),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new ButtonBar(alignment: MainAxisAlignment.center, children: <Widget>[
+                      new RaisedButton.icon(
+                          shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                          onPressed: getPhoto,
+                          icon: new Icon(Icons.add_a_photo, size:40 , color: Colors.pinkAccent,), label: Text('appareil')),
+                      new Padding(padding: new EdgeInsets.all(10.0)),
+                      new RaisedButton.icon(
+                          shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                          onPressed: getImage,
+                          icon: new Icon(Icons.add_photo_alternate, size:40, color: Colors.pinkAccent,), label: Text('galerie')),
+                    ],),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(0),
+                      child: chooseimage(0, images),),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(1),
+                      child: chooseimage(1, images),),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(2),
+                      child: chooseimage(2, images),),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(3),
+                      child: chooseimage(3, images),),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(4),
+                      child: chooseimage(4, images),),
+                    new Padding(padding: new EdgeInsets.all(10.0)),
+                    new GestureDetector(
+                      onTap: () => supandsort(5),
+                      child: chooseimage(5, images),
+                    ),
+                    new Padding(padding: new EdgeInsets.all(20.0)),
+                  ]),
+                ),
+              );
+              },
+          )
         ),
       )
     );

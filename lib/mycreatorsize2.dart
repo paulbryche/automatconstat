@@ -55,7 +55,7 @@ class _MyCreatorSize2State extends State<MyCreatorSize2> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Choisir le Marché")),
+        appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Choisir le Bon")),
         body: Container (
           child: FutureBuilder(
             future: getmarkets(),
