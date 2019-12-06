@@ -67,7 +67,7 @@ class SizeImagePickerState extends State<SizeImagePicker> {
       return (Container(
           padding: const EdgeInsets.all(8.0),
           alignment: Alignment.topCenter,
-          child: Image.file(images[index], width: 300,)
+          child: Image.file(images[index], width: 350,)
       ));
     else
       return Text("No Image load");
@@ -120,27 +120,27 @@ class SizeImagePickerState extends State<SizeImagePicker> {
                     ],),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(0),
+                      onTap: () => supandsort(0),
                       child: chooseimage(0, images),),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(1),
+                      onTap: () => supandsort(1),
                       child: chooseimage(1, images),),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(2),
+                      onTap: () => supandsort(2),
                       child: chooseimage(2, images),),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(3),
+                      onTap: () => supandsort(3),
                       child: chooseimage(3, images),),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(4),
+                      onTap: () => supandsort(4),
                       child: chooseimage(4, images),),
                     new Padding(padding: new EdgeInsets.all(10.0)),
                     new GestureDetector(
-                      onLongPress: () => supandsort(5),
+                      onTap: () => supandsort(5),
                       child: chooseimage(5, images),
                     ),
                     new Padding(padding: new EdgeInsets.all(20.0)),
