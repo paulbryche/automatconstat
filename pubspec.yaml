@@ -25,6 +25,7 @@ dependencies:
   sqflite: ^1.1.7+1
   image_picker: ^0.6.2+1
   flutter_html_to_pdf: ^0.5.2
+  flutter_pdfview: ^1.0.0+9
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

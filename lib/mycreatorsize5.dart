@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'mycreatorsize6.dart';
 
+import 'package:flutter_pdfview/flutter_pdfview.dart';
+
+import 'package:flutter/services.dart';
+
 class MyCreatorSize5 extends StatefulWidget {
   final String marketname;
   final String ticket;
@@ -23,6 +27,10 @@ class MyCreatorSize5 extends StatefulWidget {
 
 class MyCreatorSize5State extends State<MyCreatorSize5> {
   String generatedPdfFilePath;
+  int _totalPages = 0;
+  int _currentPage = 0;
+  bool pdfReady = false;
+  PDFViewController _pdfViewController;
 
   @override
   void initState() {
@@ -84,32 +92,64 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Constat de mesure 5/6")),
-        body:  new Container(color: Colors.white,
-          child: new Center(
-            child: Column(children: [
-              new Container(
-                padding: EdgeInsets.only(top: 24),
-                width: 320,
-                height: 60,
-                child: new RaisedButton(
-                  color: Colors.pinkAccent,
-                  shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
-                  child: new Text('Etape suivante',
-                    textAlign: TextAlign.center,
-                    style: new TextStyle(color: Colors.white, fontSize: 30),),
-                  onPressed: (){
-                    var route = new MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                      new MyCreatorSize6(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment, images: widget.images),
-                    );
-                    Navigator.of(context).push(route);
-                    },
-                ),
-              ),
-              new Padding(padding: new EdgeInsets.all(10.0)),
-            ]),
+      body: Stack(
+        children: <Widget>[
+          PDFView(
+            filePath: generatedPdfFilePath,
+            autoSpacing: true,
+            enableSwipe: true,
+            pageSnap: true,
+            swipeHorizontal: true,
+            nightMode: false,
+            onError: (e) {
+              print(e);
+            },
+            onRender: (_pages) {
+              setState(() {
+                _totalPages = _pages;
+                pdfReady = true;
+              });
+            },
+            onViewCreated: (PDFViewController vc) {
+              _pdfViewController = vc;
+            },
+            onPageChanged: (int page, int total) {
+              setState(() {});
+            },
+            onPageError: (page, e) {},
           ),
-        )
+          !pdfReady
+              ? Center(
+            child: CircularProgressIndicator(),
+          )
+              : Offstage()
+        ],
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          _currentPage > 0
+              ? FloatingActionButton.extended(
+            backgroundColor: Colors.red,
+            label: Text("Go to ${_currentPage - 1}"),
+            onPressed: () {
+              _currentPage -= 1;
+              _pdfViewController.setPage(_currentPage);
+            },
+          )
+              : Offstage(),
+          _currentPage+1 < _totalPages
+              ? FloatingActionButton.extended(
+            backgroundColor: Colors.green,
+            label: Text("Go to ${_currentPage + 1}"),
+            onPressed: () {
+              _currentPage += 1;
+              _pdfViewController.setPage(_currentPage);
+            },
+          )
+              : Offstage(),
+        ],
+      ),
     );
   }
 }
