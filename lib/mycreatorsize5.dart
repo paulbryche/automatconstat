@@ -27,18 +27,49 @@ class MyCreatorSize5 extends StatefulWidget {
 
 class MyCreatorSize5State extends State<MyCreatorSize5> {
   String generatedPdfFilePath;
-  int _totalPages = 0;
-  int _currentPage = 0;
-  bool pdfReady = false;
-  PDFViewController _pdfViewController;
+  String assetPDFPath = "";
 
   @override
   void initState() {
     super.initState();
-    generateExampleDocument();
+
+    generateExampleDocument().then((f) {
+      setState(() {
+        generatedPdfFilePath = f;
+      });
+    });
+
+    getFileFromAsset("assets/mypdf.pdf").then((f) {
+      setState(() {
+        assetPDFPath = f.path;
+        print(assetPDFPath);
+      });
+    });
   }
 
-  Future<void> generateExampleDocument() async {
+  Future<File> getFileFromAsset(String asset) async {
+    try {
+      var data = await rootBundle.load(asset);
+      var bytes = data.buffer.asUint8List();
+      var dir = await getApplicationDocumentsDirectory();
+      File file = File("${dir.path}/mypdf.pdf");
+      print(file);
+
+      File assetFile = await file.writeAsBytes(bytes);
+      return assetFile;
+    } catch (e) {
+      throw Exception("Error opening file");
+    }
+  }
+
+  Future<String> generateExampleDocument() async {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    var targetPath = appDocDir.path;
+    var targetFileName = "mypdf";
+    File mysignature = File("${appDocDir.path}/Signatures/mysignature.png");
+
+    print("mysignature = $mysignature");
+
     var htmlContent = """
     <!DOCTYPE html>
     <html>
@@ -74,28 +105,97 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
         </table>
 
         <p>Image loaded from web</p>
-        <img src="https://i.imgur.com/wxaJsXF.png" alt="web-img">
+        <img src="${widget.images[0]}" alt="web-img">
       </body>
     </html>
     """;
 
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    var targetPath = appDocDir.path;
-    var targetFileName = "example-pdf";
-
     var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
         htmlContent, targetPath, targetFileName);
     generatedPdfFilePath = generatedPdfFile.path;
+    return (generatedPdfFilePath);
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: AppBar(backgroundColor: Colors.pinkAccent, title: Text("Constat de mesure 5/6")),
+      appBar: AppBar(backgroundColor: Colors.pinkAccent,
+          title: Text("Constat de mesure 5/6")),
+      body:new Container(color: Colors.white,
+          child: new Center(
+              child: Column(children: [
+                new Container(
+                  padding: EdgeInsets.only(top: 24),
+                  width: 320,
+                  height: 60,
+                  child: new RaisedButton(
+                    color: Colors.pinkAccent,
+                    shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                    child: new Text('Etape suivante',
+                      textAlign: TextAlign.center,
+                      style: new TextStyle(color: Colors.white, fontSize: 30),),
+                    onPressed: (){
+                      var route = new MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                        new MyCreatorSize6(marketname: widget.marketname, ticket: widget.ticket, tdescription: widget.tdescription, comment: widget.comment, images: widget.images),
+                      );
+                      Navigator.of(context).push(route);
+                    },
+                  ),
+                ),
+                new Padding(padding: new EdgeInsets.all(10.0)),
+                new Container(
+                  padding: EdgeInsets.only(top: 24),
+                  width: 320,
+                  height: 60,
+                  child: new RaisedButton(
+                    color: Colors.pinkAccent,
+                    shape: RoundedRectangleBorder(side: BorderSide.none, borderRadius: BorderRadius.circular(15)),
+                    child: new Text('Voir le pdf',
+                      textAlign: TextAlign.center,
+                      style: new TextStyle(color: Colors.white, fontSize: 30),),
+                    onPressed: () {
+                      if (assetPDFPath != null) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    PdfViewPage(path: assetPDFPath)));
+                      }
+                    },
+                  ),
+                ),
+              ])
+          )
+      ),
+    );
+  }
+}
+
+class PdfViewPage extends StatefulWidget {
+  final String path;
+
+  const PdfViewPage({Key key, this.path}) : super(key: key);
+  @override
+  _PdfViewPageState createState() => _PdfViewPageState();
+}
+
+class _PdfViewPageState extends State<PdfViewPage> {
+  int _totalPages = 0;
+  int _currentPage = 0;
+  bool pdfReady = false;
+  PDFViewController _pdfViewController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("PDF"),
+      ),
       body: Stack(
         children: <Widget>[
           PDFView(
-            filePath: generatedPdfFilePath,
+            filePath: widget.path,
             autoSpacing: true,
             enableSwipe: true,
             pageSnap: true,

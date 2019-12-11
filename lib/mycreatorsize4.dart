@@ -70,7 +70,7 @@ class SizeImagePickerState extends State<SizeImagePicker> {
           child: Image.file(images[index], width: 300,)
       ));
     else
-      return Text("No Image load");
+      return Text("Aucune image");
   }
 
   @override
