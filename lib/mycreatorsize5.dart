@@ -1,16 +1,14 @@
 import 'dart:io';
-import 'dart:async';
-
-import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'mycreatorsize6.dart';
 
-import 'package:flutter_pdfview/flutter_pdfview.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
 
-import 'package:flutter/services.dart';
+import 'pdfsizegenerator.dart';
 
 class MyCreatorSize5 extends StatefulWidget {
   final String marketname;
@@ -26,94 +24,82 @@ class MyCreatorSize5 extends StatefulWidget {
 }
 
 class MyCreatorSize5State extends State<MyCreatorSize5> {
-  String generatedPdfFilePath;
-  String assetPDFPath = "";
+
+  final pdf = pw.Document();
+
+  writeOnPdf(){
+    pdf.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a5,
+          margin: pw.EdgeInsets.all(32),
+
+          build: (pw.Context context){
+            return <pw.Widget>  [
+              pw.Header(
+                  level: 0,
+                  child: pw.Text("Easy Approach Document")
+              ),
+
+            pw.Paragraph(
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              ),
+
+              pw.Paragraph(
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              ),
+
+              pw.Header(
+                  level: 1,
+                  child: pw.Text("Second Heading")
+              ),
+
+              pw.Paragraph(
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              ),
+
+              pw.Paragraph(
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              ),
+
+              pw.Paragraph(
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              ),
+            ];
+          },
+        )
+    );
+
+    for (int i = 0; i < 6; i++) {
+      if (widget.images[i] != null) {
+        final image = PdfImage.file(
+          pdf.document,
+          bytes: widget.images[i].readAsBytesSync(),
+        );
+
+        pdf.addPage(pw.Page(
+            build: (pw.Context context) {
+              return pw.Center(
+                child: pw.Image(image),
+              ); // Center
+            })); // Page
+      }
+    }
+
+  }
+
+  Future savePdf() async{
+    Directory documentDirectory = await getApplicationDocumentsDirectory();
+
+    String documentPath = documentDirectory.path;
+
+    File file = File("$documentPath/temporary.pdf");
+
+    file.writeAsBytesSync(pdf.save());
+  }
 
   @override
   void initState() {
     super.initState();
-
-    generateExampleDocument().then((f) {
-      setState(() {
-        generatedPdfFilePath = f;
-      });
-    });
-
-    getFileFromAsset("assets/mypdf.pdf").then((f) {
-      setState(() {
-        assetPDFPath = f.path;
-        print(assetPDFPath);
-      });
-    });
-  }
-
-  Future<File> getFileFromAsset(String asset) async {
-    try {
-      var data = await rootBundle.load(asset);
-      var bytes = data.buffer.asUint8List();
-      var dir = await getApplicationDocumentsDirectory();
-      File file = File("${dir.path}/mypdf.pdf");
-      print(file);
-
-      File assetFile = await file.writeAsBytes(bytes);
-      return assetFile;
-    } catch (e) {
-      throw Exception("Error opening file");
-    }
-  }
-
-  Future<String> generateExampleDocument() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    var targetPath = appDocDir.path;
-    var targetFileName = "mypdf";
-    File mysignature = File("${appDocDir.path}/Signatures/mysignature.png");
-
-    print("mysignature = $mysignature");
-
-    var htmlContent = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-        table, th, td {
-          border: 1px solid black;
-          border-collapse: collapse;
-        }
-        th, td, p {
-          padding: 5px;
-          text-align: left;
-        }
-        </style>
-      </head>
-      <body>
-        <h2>PDF Generated with flutter_html_to_pdf plugin</h2>
-
-        <table style="width:100%">
-          <caption>Sample HTML Table</caption>
-          <tr>
-            <th>Month</th>
-            <th>Savings</th>
-          </tr>
-          <tr>
-            <td>January</td>
-            <td>100</td>
-          </tr>
-          <tr>
-            <td>February</td>
-            <td>50</td>
-          </tr>
-        </table>
-
-        <p>Image loaded from web</p>
-        <img src="${widget.images[0]}" alt="web-img">
-      </body>
-    </html>
-    """;
-
-    var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
-        htmlContent, targetPath, targetFileName);
-    generatedPdfFilePath = generatedPdfFile.path;
-    return (generatedPdfFilePath);
   }
 
   @override
@@ -154,101 +140,25 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
                     child: new Text('Voir le pdf',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: () {
-                      if (assetPDFPath != null) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    PdfViewPage(path: assetPDFPath)));
-                      }
+                    onPressed: ()async{
+                      writeOnPdf();
+                      await savePdf();
+
+                      Directory documentDirectory = await getApplicationDocumentsDirectory();
+
+                      String documentPath = documentDirectory.path;
+
+                      String fullPath = "$documentPath/temporary.pdf";
+
+                      Navigator.push(context, MaterialPageRoute(
+                          builder: (context) => PdfPreviewScreen(path: fullPath,)
+                      ));
+
                     },
                   ),
                 ),
               ])
           )
-      ),
-    );
-  }
-}
-
-class PdfViewPage extends StatefulWidget {
-  final String path;
-
-  const PdfViewPage({Key key, this.path}) : super(key: key);
-  @override
-  _PdfViewPageState createState() => _PdfViewPageState();
-}
-
-class _PdfViewPageState extends State<PdfViewPage> {
-  int _totalPages = 0;
-  int _currentPage = 0;
-  bool pdfReady = false;
-  PDFViewController _pdfViewController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("PDF"),
-      ),
-      body: Stack(
-        children: <Widget>[
-          PDFView(
-            filePath: widget.path,
-            autoSpacing: true,
-            enableSwipe: true,
-            pageSnap: true,
-            swipeHorizontal: true,
-            nightMode: false,
-            onError: (e) {
-              print(e);
-            },
-            onRender: (_pages) {
-              setState(() {
-                _totalPages = _pages;
-                pdfReady = true;
-              });
-            },
-            onViewCreated: (PDFViewController vc) {
-              _pdfViewController = vc;
-            },
-            onPageChanged: (int page, int total) {
-              setState(() {});
-            },
-            onPageError: (page, e) {},
-          ),
-          !pdfReady
-              ? Center(
-            child: CircularProgressIndicator(),
-          )
-              : Offstage()
-        ],
-      ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          _currentPage > 0
-              ? FloatingActionButton.extended(
-            backgroundColor: Colors.red,
-            label: Text("Go to ${_currentPage - 1}"),
-            onPressed: () {
-              _currentPage -= 1;
-              _pdfViewController.setPage(_currentPage);
-            },
-          )
-              : Offstage(),
-          _currentPage+1 < _totalPages
-              ? FloatingActionButton.extended(
-            backgroundColor: Colors.green,
-            label: Text("Go to ${_currentPage + 1}"),
-            onPressed: () {
-              _currentPage += 1;
-              _pdfViewController.setPage(_currentPage);
-            },
-          )
-              : Offstage(),
-        ],
       ),
     );
   }
