@@ -1,6 +1,8 @@
 # automatconstat
 
 Application Flutter d'automatisation des taches de création de documents sur téléphone.
+Cette solution technique a été mise en place au sein du SIR Ouest (Service d'Ingénieurie Ouest)
+dans le but de simplifier le travail des controleurs des travaux.
 
 ## Getting Started
 
