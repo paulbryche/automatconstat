@@ -37,7 +37,7 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
             return <pw.Widget>  [
               pw.Header(
                   level: 0,
-                  child: pw.Text("Easy Approach Document")
+                  child: pw.Text(widget.marketname) 
               ),
 
             pw.Paragraph(
