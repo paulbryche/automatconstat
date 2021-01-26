@@ -2,13 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
-import 'mycreatorsize6.dart';
+import 'package:flutter/services.dart';
 
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
-
 import 'pdfsizegenerator.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'mycreatorsize6.dart';
+
+
 
 class MyCreatorSize5 extends StatefulWidget {
   final String marketname;
@@ -24,67 +29,95 @@ class MyCreatorSize5 extends StatefulWidget {
 }
 
 class MyCreatorSize5State extends State<MyCreatorSize5> {
-
   final pdf = pw.Document();
 
-  writeOnPdf(){
+
+  Future writeOnPdf() async {
+    final marianne = await get_pdf_image('pdf_files/marianne.png');
+
+    Directory directory = await getApplicationDocumentsDirectory();
+    String signature_editor_path = directory.path + "/Signatures/mysignature.png";
+    final signature_editor = await get_pdf_image(signature_editor_path);
+
+    final name = await getname();
+
     pdf.addPage(
         pw.MultiPage(
-          pageFormat: PdfPageFormat.a5,
+          pageFormat: PdfPageFormat.a4,
           margin: pw.EdgeInsets.all(32),
-
           build: (pw.Context context){
             return <pw.Widget>  [
+              pw.Row(
+                  verticalDirection: pw.VerticalDirection.up,
+                  mainAxisAlignment : pw.MainAxisAlignment.center,
+                children:  [
+                  pw.Image(marianne,width:300 ,height:200),
+                ]
+              ),
               pw.Header(
                   level: 0,
-                  child: pw.Text(widget.marketname) 
+                  child: pw.Text("Numéro de Marché: " + widget.marketname, textScaleFactor: 2)
               ),
-
-            pw.Paragraph(
-                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
-              ),
-
+              pw.Text("Numéro de Bon: " + widget.ticket + " / " + widget.tdescription, textScaleFactor: 1.62),
+              pw.Padding(padding: pw.EdgeInsets.all(10),),
               pw.Paragraph(
-                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed.",
+                  style: pw.TextStyle(fontSize: 16),
               ),
-
-              pw.Header(
-                  level: 1,
-                  child: pw.Text("Second Heading")
+              pw.Row(
+                  verticalDirection: pw.VerticalDirection.down,
+                  mainAxisAlignment : pw.MainAxisAlignment.center,
+                  children:  [
+                    pw.Text("Réprésentant CIR: " + name, textScaleFactor: 1),
+                    pw.Padding(padding: pw.EdgeInsets.all(30),),
+                    pw.Text("Responsable Entreprise: " + widget.marketname, textScaleFactor: 1),
+                  ]
               ),
-
-              pw.Paragraph(
-                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
-              ),
-
-              pw.Paragraph(
-                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
-              ),
-
-              pw.Paragraph(
-                  text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Malesuada fames ac turpis egestas sed tempus urna. Quisque sagittis purus sit amet. A arcu cursus vitae congue mauris rhoncus aenean vel elit. Ipsum dolor sit amet consectetur adipiscing elit pellentesque. Viverra justo nec ultrices dui sapien eget mi proin sed."
+              pw.Row(
+                  verticalDirection: pw.VerticalDirection.down,
+                  mainAxisAlignment : pw.MainAxisAlignment.center,
+                  children:  [
+                    pw.Image(signature_editor, width:200, height:200),
+                    pw.Padding(padding: pw.EdgeInsets.all(40),),
+                    pw.Image(signature_editor, width:200, height:200),
+                  ]
               ),
             ];
           },
         )
     );
-
     for (int i = 0; i < 6; i++) {
       if (widget.images[i] != null) {
-        final image = PdfImage.file(
-          pdf.document,
-          bytes: widget.images[i].readAsBytesSync(),
-        );
+        final image = pw.MemoryImage(File(widget.images[i].path).readAsBytesSync(),);
 
         pdf.addPage(pw.Page(
             build: (pw.Context context) {
               return pw.Center(
-                child: pw.Image(image),
+                child: pw.Image(image,),
               ); // Center
             })); // Page
       }
     }
+  }
 
+  Future getname() async {
+    String name;
+    String first_name;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    name = prefs.getString("name");
+    first_name = prefs.getString("first");
+
+    if (name == null)
+      return ("");
+    if (name != null && first_name != null)
+      name = name + " " + first_name;
+    return (name);
+  }
+
+  Future get_pdf_image(String path) async {
+    final image = pw.MemoryImage((await rootBundle.load(path)).buffer.asUint8List(),);
+    return (image);
   }
 
   Future savePdf() async{
@@ -94,7 +127,7 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
 
     File file = File("$documentPath/temporary.pdf");
 
-    file.writeAsBytesSync(pdf.save());
+    file.writeAsBytesSync(await pdf.save());
   }
 
   @override
@@ -140,20 +173,22 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
                     child: new Text('Voir le pdf',
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 30),),
-                    onPressed: ()async{
-                      writeOnPdf();
+                    onPressed: () async {
+                      new SnackBar(duration: new Duration(seconds: 4), content: new Row(
+                        children: <Widget>[
+                          new CircularProgressIndicator(),
+                          new Text("  Signing-In...")
+                        ],
+                      ),
+                      );
+                      await writeOnPdf();
                       await savePdf();
-
                       Directory documentDirectory = await getApplicationDocumentsDirectory();
-
                       String documentPath = documentDirectory.path;
-
                       String fullPath = "$documentPath/temporary.pdf";
-
                       Navigator.push(context, MaterialPageRoute(
                           builder: (context) => PdfPreviewScreen(path: fullPath,)
                       ));
-
                     },
                   ),
                 ),
