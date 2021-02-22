@@ -60,6 +60,8 @@ class SizeImagePickerState extends State<SizeImagePicker> {
     }
     print(sup);
     print(pos);
+    setState(() {
+    });
   }
 
   Widget chooseimage(int index, List<File> images){

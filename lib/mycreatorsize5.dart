@@ -174,13 +174,6 @@ class MyCreatorSize5State extends State<MyCreatorSize5> {
                       textAlign: TextAlign.center,
                       style: new TextStyle(color: Colors.white, fontSize: 30),),
                     onPressed: () async {
-                      new SnackBar(duration: new Duration(seconds: 4), content: new Row(
-                        children: <Widget>[
-                          new CircularProgressIndicator(),
-                          new Text("  Signing-In...")
-                        ],
-                      ),
-                      );
                       await writeOnPdf();
                       await savePdf();
                       Directory documentDirectory = await getApplicationDocumentsDirectory();
