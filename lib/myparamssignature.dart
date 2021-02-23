@@ -80,7 +80,6 @@ class _HomePageState extends State<MyParamsSignature> {
     setState(() {
       image = renderedImage;
     });
-
     showImage(context);
   }
 
@@ -95,6 +94,7 @@ class _HomePageState extends State<MyParamsSignature> {
     });
     File('$path/Signatures/mysignature.png')
         .writeAsBytesSync(pngBytes.buffer.asInt8List());
+    print("save done for signature");
     return showDialog<Null>(
         context: context,
         builder: (BuildContext context) {

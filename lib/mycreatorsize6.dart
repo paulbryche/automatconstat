@@ -4,7 +4,6 @@ import 'package:flutter/painting.dart';
 
 //for signature
 import 'package:path_provider/path_provider.dart';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 //pdf generation
@@ -14,6 +13,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'pdfsizegenerator.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:downloads_path_provider/downloads_path_provider.dart';
 
 class MyCreatorSize6 extends StatefulWidget {
   final String marketname;
@@ -130,11 +131,16 @@ class _MyCreatorSize6State extends State<MyCreatorSize6> {
   }
 
   Future savePdf() async{
-    Directory documentDirectory = await getApplicationDocumentsDirectory();
 
-    String documentPath = documentDirectory.path;
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+    // the downloads folder path
+    Directory tempDir = await DownloadsPathProvider.downloadsDirectory;
+    String tempPath = tempDir.path;
 
-    File file = File("$documentPath/temporary.pdf");
+    File file = File("$tempPath/final_pdf.pdf");
 
     file.writeAsBytesSync(await pdf.save());
   }
